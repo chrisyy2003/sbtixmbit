@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #f6faf6;
+  --color-card: #ffffff;
+  --color-text: #1e2a22;
+  --color-muted: #6a786f;
+  --color-border: #dbe8dd;
+  --color-selected-bg: #edf6ef;
+  --color-selected-border: #4d6a53;
+  --color-btn: #4d6a53;
+  --color-btn-hover: #3d5a43;
+  --color-green-light: #edf6ef;
+  --color-green: #4d6a53;
+}
+
+body {
+  background: radial-gradient(circle at top left, #f8fff8 0%, #f6faf6 36%, #f2f7f3 100%);
+}
