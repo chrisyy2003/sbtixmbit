@@ -132,10 +132,10 @@ export default function Home() {
     <div className="min-h-screen bg-bg">
       <div className="max-w-[960px] mx-auto px-4 py-8">
         {/* Form Card */}
-        <div className="bg-card border border-border rounded-[22px] shadow-[0_16px_40px_rgba(47,73,55,0.08)] p-6">
+        <div className="bg-card border border-border rounded-[22px] shadow-[0_16px_40px_rgba(47,73,55,0.08)] p-4 md:p-6">
           {/* Header */}
           <div className="text-center mb-6">
-            <h1 className="text-[28px] font-bold text-text">
+            <h1 className="text-2xl md:text-[28px] font-bold text-text">
               SBTI × MBTI 对照统计
             </h1>
             <p className="text-muted text-sm mt-2">
@@ -144,7 +144,7 @@ export default function Home() {
           </div>
 
           {/* Selectors - Two Column Layout */}
-          <div className="flex gap-6 items-stretch">
+          <div className="flex flex-col md:flex-row gap-6 items-stretch">
             {/* Left: MBTI */}
             <div className="flex-1 flex flex-col items-center">
               <TypeSelector
@@ -153,15 +153,15 @@ export default function Home() {
                 selected={mbti}
                 onSelect={setMbti}
               />
-              <div className="mt-auto pt-4 h-48 flex items-center justify-center">
+              <div className="mt-auto pt-4 h-32 w-32 md:h-48 md:w-48 flex items-center justify-center">
                 {mbti ? (
                   <img
                     src={getMbtiImage(mbti)}
                     alt={mbti}
-                    className="h-48 w-48 object-contain"
+                    className="h-32 w-32 md:h-48 md:w-48 object-contain"
                   />
                 ) : (
-                  <div className="h-48 w-48 rounded-xl border-2 border-dashed border-border flex items-center justify-center text-sm text-muted">
+                  <div className="h-32 w-32 md:h-48 md:w-48 rounded-xl border-2 border-dashed border-border flex items-center justify-center text-sm text-muted">
                     选择类型查看图片
                   </div>
                 )}
@@ -169,7 +169,8 @@ export default function Home() {
             </div>
 
             {/* Divider */}
-            <div className="w-px bg-border self-stretch" />
+            <div className="hidden md:block w-px bg-border self-stretch" />
+            <div className="md:hidden h-px bg-border" />
 
             {/* Right: SBTI */}
             <div className="flex-1 flex flex-col items-center">
@@ -179,15 +180,15 @@ export default function Home() {
                 selected={sbti}
                 onSelect={setSbti}
               />
-              <div className="mt-auto pt-4 h-48 flex items-center justify-center">
+              <div className="mt-auto pt-4 h-32 w-32 md:h-48 md:w-48 flex items-center justify-center">
                 {sbti ? (
                   <img
                     src={getSbtiImage(sbti)}
                     alt={sbti}
-                    className="h-48 w-48 object-contain"
+                    className="h-32 w-32 md:h-48 md:w-48 object-contain"
                   />
                 ) : (
-                  <div className="h-48 w-48 rounded-xl border-2 border-dashed border-border flex items-center justify-center text-sm text-muted">
+                  <div className="h-32 w-32 md:h-48 md:w-48 rounded-xl border-2 border-dashed border-border flex items-center justify-center text-sm text-muted">
                     选择类型查看图片
                   </div>
                 )}
@@ -240,7 +241,7 @@ export default function Home() {
         </div>
 
         {/* Stats Card */}
-        <div className="bg-card border border-border rounded-[22px] shadow-[0_16px_40px_rgba(47,73,55,0.08)] p-6 mt-6">
+        <div className="bg-card border border-border rounded-[22px] shadow-[0_16px_40px_rgba(47,73,55,0.08)] p-4 md:p-6 mt-6">
           <h2 className="text-xl font-semibold text-text mb-4">统计结果</h2>
           {stats ? (
             <StatsTable
@@ -257,7 +258,7 @@ export default function Home() {
         </div>
 
         {/* Footer / Credits */}
-        <div className="bg-card border border-border rounded-[22px] shadow-[0_16px_40px_rgba(47,73,55,0.08)] p-5 mt-6">
+        <div className="bg-card border border-border rounded-[22px] shadow-[0_16px_40px_rgba(47,73,55,0.08)] p-4 md:p-5 mt-6">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <a
               href="https://sbti.unun.dev"

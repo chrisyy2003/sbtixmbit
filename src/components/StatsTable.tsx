@@ -78,6 +78,23 @@ export default function StatsTable({
     }
   }
 
+  // Compute row sums and column sums for sorting (data first)
+  const rowSums: Record<string, number> = {};
+  const colSums: Record<string, number> = {};
+  for (const mbti of mbtiTypes) {
+    let sum = 0;
+    for (const sbti of sbtiTypes) {
+      const v = matrix[mbti]?.[sbti] || 0;
+      sum += v;
+      colSums[sbti] = (colSums[sbti] || 0) + v;
+    }
+    rowSums[mbti] = sum;
+  }
+
+  // Sort: rows/columns with data come first, sorted by total descending
+  const sortedMbti = [...mbtiTypes].sort((a, b) => (rowSums[b] || 0) - (rowSums[a] || 0));
+  const sortedSbti = [...sbtiTypes].sort((a, b) => (colSums[b] || 0) - (colSums[a] || 0));
+
   return (
     <div className="space-y-6">
       {/* Total */}
@@ -94,6 +111,11 @@ export default function StatsTable({
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
             {sbtiTypes
               .filter((s) => topMatches[s])
+              .sort((a, b) => {
+                const sumA = topMatches[a].reduce((s, m) => s + m.count, 0);
+                const sumB = topMatches[b].reduce((s, m) => s + m.count, 0);
+                return sumB - sumA;
+              })
               .map((sbti) => (
                 <div
                   key={sbti}
@@ -146,6 +168,11 @@ export default function StatsTable({
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
             {mbtiTypes
               .filter((m) => topMbtiMatches[m])
+              .sort((a, b) => {
+                const sumA = topMbtiMatches[a].reduce((s, m) => s + m.count, 0);
+                const sumB = topMbtiMatches[b].reduce((s, m) => s + m.count, 0);
+                return sumB - sumA;
+              })
               .map((mbti) => (
                 <div
                   key={mbti}
@@ -195,7 +222,7 @@ export default function StatsTable({
                     style={{ background: "var(--color-green-light)" }}>
                   MBTI ↓ SBTI →
                 </th>
-                {sbtiTypes.map((s) => (
+                {sortedSbti.map((s) => (
                   <th
                     key={s}
                     className="px-2 py-2 text-muted font-bold text-xs whitespace-nowrap text-center"
@@ -209,12 +236,12 @@ export default function StatsTable({
               </tr>
             </thead>
             <tbody>
-              {mbtiTypes.map((mbti) => (
+              {sortedMbti.map((mbti) => (
                 <tr key={mbti} className="border-t border-border">
                   <td className="sticky left-0 z-10 px-3 py-2 font-bold text-text whitespace-nowrap bg-card">
                     {mbti}
                   </td>
-                  {sbtiTypes.map((sbti) => {
+                  {sortedSbti.map((sbti) => {
                     const c = matrix[mbti]?.[sbti] || 0;
                     return (
                       <td
