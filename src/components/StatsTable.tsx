@@ -37,6 +37,8 @@ interface StatsTableProps {
   topMbtiMatches: Record<string, { sbti: string; count: number }[]>;
   mbtiTypes: string[];
   sbtiTypes: string[];
+  userMbti?: string | null;
+  userSbti?: string | null;
 }
 
 function getCellBg(count: number, max: number): string {
@@ -55,6 +57,186 @@ function getCellColor(count: number, max: number): string {
   return "#1e2a22";
 }
 
+function SectionTitle({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="text-[16px] font-bold text-text mb-3">{children}</div>
+  );
+}
+
+/* ── 排行榜 ── */
+function RankingChart({
+  title,
+  items,
+  getLabel,
+  getSubLabel,
+}: {
+  title: string;
+  items: { key: string; count: number }[];
+  getLabel: (key: string) => string;
+  getSubLabel?: (key: string) => string | undefined;
+}) {
+  const maxCount = items.length > 0 ? items[0].count : 1;
+  const TOP_N = 10;
+  const display = items.slice(0, TOP_N);
+
+  if (display.length === 0) return null;
+
+  return (
+    <>
+      <SectionTitle>{title}</SectionTitle>
+      <div className="space-y-2">
+        {display.map((item, i) => (
+          <div key={item.key} className="flex items-center gap-2.5">
+            <span
+              className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+              style={{
+                background: i < 3 ? "var(--color-green)" : "var(--color-border)",
+                color: i < 3 ? "#fff" : "var(--color-muted)",
+              }}
+            >
+              {i + 1}
+            </span>
+            <div className="flex-shrink-0 w-20 text-sm">
+              <span className="font-bold text-text">{getLabel(item.key)}</span>
+              {getSubLabel && getSubLabel(item.key) && (
+                <span className="text-muted text-xs ml-1">
+                  {getSubLabel(item.key)}
+                </span>
+              )}
+            </div>
+            <div className="flex-1 bg-bg rounded-full h-3.5 overflow-hidden">
+              <div
+                className="h-full rounded-full transition-all duration-500"
+                style={{
+                  width: `${(item.count / maxCount) * 100}%`,
+                  background:
+                    i === 0
+                      ? "linear-gradient(90deg, #6d9176, #4d6a53)"
+                      : i === 1
+                        ? "linear-gradient(90deg, #97b59c, #6d9176)"
+                        : i === 2
+                          ? "linear-gradient(90deg, #b6ccb8, #97b59c)"
+                          : "linear-gradient(90deg, #d4e3d7, #b6ccb8)",
+                }}
+              />
+            </div>
+            <span className="text-muted text-xs w-8 text-right font-semibold">
+              {item.count}
+            </span>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}
+
+/* ── 个人匹配卡片 ── */
+function PersonalMatch({
+  mbti,
+  sbti,
+  matrix,
+  total,
+}: {
+  mbti: string;
+  sbti: string;
+  matrix: Record<string, Record<string, number>>;
+  total: number;
+}) {
+  const pairCount = matrix[mbti]?.[sbti] || 0;
+  const sameMbti = Object.values(matrix[mbti] || {}).reduce(
+    (a, b) => a + b,
+    0
+  );
+  const sameSbtiTotal = Object.entries(matrix).reduce(
+    (acc, [, row]) => acc + (row[sbti] || 0),
+    0
+  );
+
+  // 在同一 MBTI 中的 SBTI 排名
+  const sameMbtiRankings = Object.entries(matrix[mbti] || {}).sort(
+    (a, b) => b[1] - a[1]
+  );
+  const myRank =
+    sameMbtiRankings.findIndex(([s]) => s === sbti) + 1;
+  const uniqueSbtis = sameMbtiRankings.filter(([, c]) => c > 0).length;
+
+  const pairPct = total > 0 ? ((pairCount / total) * 100).toFixed(2) : "0";
+  const mbtiPct = total > 0 ? ((sameMbti / total) * 100).toFixed(1) : "0";
+  const sbtiPct = total > 0 ? ((sameSbtiTotal / total) * 100).toFixed(1) : "0";
+
+  return (
+    <div
+      className="rounded-[22px] p-5 border-2"
+      style={{
+        background:
+          "linear-gradient(135deg, #edf6ef 0%, #d4e8d8 50%, #edf6ef 100%)",
+        borderColor: "var(--color-green)",
+      }}
+    >
+      <div className="flex items-center gap-2 mb-3">
+        <span className="text-lg">&#x1F3C6;</span>
+        <span className="font-bold text-text text-base">你的匹配结果</span>
+      </div>
+
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-4">
+        <div className="text-center">
+          <div className="text-2xl font-bold text-green">{mbti}</div>
+          <div className="text-xs text-muted">你的 MBTI</div>
+        </div>
+        <div className="text-2xl text-green font-bold">&times;</div>
+        <div className="text-center">
+          <div className="text-2xl font-bold text-green">{sbti}</div>
+          <div className="text-xs text-muted">
+            你的 SBTI
+            {SBTI_LABELS[sbti] && (
+              <span className="ml-1">({SBTI_LABELS[sbti]})</span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="bg-card/80 rounded-xl p-3 text-center border border-border">
+          <div className="text-lg font-bold text-green">{pairCount}</div>
+          <div className="text-xs text-muted">和你一样的人</div>
+        </div>
+        <div className="bg-card/80 rounded-xl p-3 text-center border border-border">
+          <div className="text-lg font-bold text-green">{pairPct}%</div>
+          <div className="text-xs text-muted">占比</div>
+        </div>
+        <div className="bg-card/80 rounded-xl p-3 text-center border border-border">
+          <div className="text-lg font-bold text-green">
+            {myRank > 0 ? `第 ${myRank}` : "-"}
+          </div>
+          <div className="text-xs text-muted">
+            在 {mbti} 中排名 (共 {uniqueSbtis})
+          </div>
+        </div>
+        <div className="bg-card/80 rounded-xl p-3 text-center border border-border">
+          <div className="text-lg font-bold text-green">{sameMbti}</div>
+          <div className="text-xs text-muted">
+            {mbti} 共 {sameMbti} 人 ({mbtiPct}%)
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-3 grid grid-cols-2 gap-3">
+        <div className="bg-card/80 rounded-xl p-3 text-center border border-border">
+          <div className="text-lg font-bold text-green">{sameSbtiTotal}</div>
+          <div className="text-xs text-muted">
+            {sbti} 共 {sameSbtiTotal} 人 ({sbtiPct}%)
+          </div>
+        </div>
+        <div className="bg-card/80 rounded-xl p-3 text-center border border-border">
+          <div className="text-lg font-bold text-green">{total}</div>
+          <div className="text-xs text-muted">总参与人数</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── 主组件 ── */
 export default function StatsTable({
   total,
   matrix,
@@ -62,6 +244,8 @@ export default function StatsTable({
   topMbtiMatches,
   mbtiTypes,
   sbtiTypes,
+  userMbti,
+  userSbti,
 }: StatsTableProps) {
   if (total === 0) {
     return (
@@ -78,7 +262,7 @@ export default function StatsTable({
     }
   }
 
-  // Compute row sums and column sums for sorting (data first)
+  // 计算各类型总数
   const rowSums: Record<string, number> = {};
   const colSums: Record<string, number> = {};
   for (const mbti of mbtiTypes) {
@@ -91,9 +275,22 @@ export default function StatsTable({
     rowSums[mbti] = sum;
   }
 
-  // Sort: rows/columns with data come first, sorted by total descending
-  const sortedMbti = [...mbtiTypes].sort((a, b) => (rowSums[b] || 0) - (rowSums[a] || 0));
-  const sortedSbti = [...sbtiTypes].sort((a, b) => (colSums[b] || 0) - (colSums[a] || 0));
+  // 排行榜数据
+  const mbtiRanked = Object.entries(rowSums)
+    .map(([key, count]) => ({ key, count }))
+    .sort((a, b) => b.count - a.count);
+
+  const sbtiRanked = Object.entries(colSums)
+    .map(([key, count]) => ({ key, count }))
+    .sort((a, b) => b.count - a.count);
+
+  // 热力图排序
+  const sortedMbti = [...mbtiTypes].sort(
+    (a, b) => (rowSums[b] || 0) - (rowSums[a] || 0)
+  );
+  const sortedSbti = [...sbtiTypes].sort(
+    (a, b) => (colSums[b] || 0) - (colSums[a] || 0)
+  );
 
   return (
     <div className="space-y-6">
@@ -102,12 +299,39 @@ export default function StatsTable({
         共 <span className="font-bold text-green">{total}</span> 人参与
       </div>
 
+      {/* Personal Match Card */}
+      {userMbti && userSbti && (
+        <PersonalMatch
+          mbti={userMbti}
+          sbti={userSbti}
+          matrix={matrix}
+          total={total}
+        />
+      )}
+
+      {/* Popularity Rankings - Two columns */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-card rounded-[18px] p-5 border border-border shadow-[0_16px_40px_rgba(47,73,55,0.08)]">
+          <RankingChart
+            title="MBTI 人气排行 TOP 10"
+            items={mbtiRanked}
+            getLabel={(k) => k}
+          />
+        </div>
+        <div className="bg-card rounded-[18px] p-5 border border-border shadow-[0_16px_40px_rgba(47,73,55,0.08)]">
+          <RankingChart
+            title="SBTI 人气排行 TOP 10"
+            items={sbtiRanked}
+            getLabel={(k) => k}
+            getSubLabel={(k) => SBTI_LABELS[k]}
+          />
+        </div>
+      </div>
+
       {/* Top Matches: SBTI → MBTI */}
       {Object.keys(topMatches).length > 0 && (
         <div>
-          <div className="text-[16px] font-bold text-text mb-3">
-            每个 SBTI 对应最多的 MBTI TOP 3
-          </div>
+          <SectionTitle>每个 SBTI 对应最多的 MBTI TOP 3</SectionTitle>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
             {sbtiTypes
               .filter((s) => topMatches[s])
@@ -131,7 +355,10 @@ export default function StatsTable({
                   </div>
                   <div className="space-y-2">
                     {topMatches[sbti].map((match, i) => (
-                      <div key={match.mbti} className="flex items-center gap-2">
+                      <div
+                        key={match.mbti}
+                        className="flex items-center gap-2"
+                      >
                         <span className="text-muted text-xs w-4">
                           {i + 1}.
                         </span>
@@ -143,7 +370,8 @@ export default function StatsTable({
                             className="h-full rounded-full"
                             style={{
                               width: `${(match.count / topMatches[sbti][0].count) * 100}%`,
-                              background: "linear-gradient(90deg, #97b59c, #5b7a62)",
+                              background:
+                                "linear-gradient(90deg, #97b59c, #5b7a62)",
                             }}
                           />
                         </div>
@@ -162,15 +390,19 @@ export default function StatsTable({
       {/* Top Matches: MBTI → SBTI (Reverse) */}
       {Object.keys(topMbtiMatches).length > 0 && (
         <div>
-          <div className="text-[16px] font-bold text-text mb-3">
-            每个 MBTI 对应最多的 SBTI TOP 3
-          </div>
+          <SectionTitle>每个 MBTI 对应最多的 SBTI TOP 3</SectionTitle>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
             {mbtiTypes
               .filter((m) => topMbtiMatches[m])
               .sort((a, b) => {
-                const sumA = topMbtiMatches[a].reduce((s, m) => s + m.count, 0);
-                const sumB = topMbtiMatches[b].reduce((s, m) => s + m.count, 0);
+                const sumA = topMbtiMatches[a].reduce(
+                  (s, m) => s + m.count,
+                  0
+                );
+                const sumB = topMbtiMatches[b].reduce(
+                  (s, m) => s + m.count,
+                  0
+                );
                 return sumB - sumA;
               })
               .map((mbti) => (
@@ -181,7 +413,10 @@ export default function StatsTable({
                   <div className="font-bold text-green mb-2">{mbti}</div>
                   <div className="space-y-2">
                     {topMbtiMatches[mbti].map((match, i) => (
-                      <div key={match.sbti} className="flex items-center gap-2">
+                      <div
+                        key={match.sbti}
+                        className="flex items-center gap-2"
+                      >
                         <span className="text-muted text-xs w-4">
                           {i + 1}.
                         </span>
@@ -193,7 +428,8 @@ export default function StatsTable({
                             className="h-full rounded-full"
                             style={{
                               width: `${(match.count / topMbtiMatches[mbti][0].count) * 100}%`,
-                              background: "linear-gradient(90deg, #97b59c, #5b7a62)",
+                              background:
+                                "linear-gradient(90deg, #97b59c, #5b7a62)",
                             }}
                           />
                         </div>
@@ -211,15 +447,15 @@ export default function StatsTable({
 
       {/* Heatmap */}
       <div>
-        <div className="text-[16px] font-bold text-text mb-3">
-          详细对照表
-        </div>
+        <SectionTitle>详细对照表</SectionTitle>
         <div className="overflow-x-auto rounded-[22px] border border-border shadow-[0_16px_40px_rgba(47,73,55,0.08)]">
           <table className="w-full text-sm border-collapse">
             <thead>
               <tr style={{ background: "var(--color-green-light)" }}>
-                <th className="sticky left-0 z-10 px-3 py-2 text-left text-muted font-bold text-sm whitespace-nowrap"
-                    style={{ background: "var(--color-green-light)" }}>
+                <th
+                  className="sticky left-0 z-10 px-3 py-2 text-left text-muted font-bold text-sm whitespace-nowrap"
+                  style={{ background: "var(--color-green-light)" }}
+                >
                   MBTI ↓ SBTI →
                 </th>
                 {sortedSbti.map((s) => (
@@ -229,7 +465,9 @@ export default function StatsTable({
                   >
                     <div>{s}</div>
                     {SBTI_LABELS[s] && (
-                      <div className="font-normal text-[10px] opacity-60">{SBTI_LABELS[s]}</div>
+                      <div className="font-normal text-[10px] opacity-60">
+                        {SBTI_LABELS[s]}
+                      </div>
                     )}
                   </th>
                 ))}
@@ -243,13 +481,23 @@ export default function StatsTable({
                   </td>
                   {sortedSbti.map((sbti) => {
                     const c = matrix[mbti]?.[sbti] || 0;
+                    const isUserCell =
+                      userMbti === mbti && userSbti === sbti && c > 0;
                     return (
                       <td
                         key={sbti}
                         className="px-2 py-2 text-center border-l border-border text-sm font-semibold"
                         style={{
-                          background: getCellBg(c, maxCount),
-                          color: getCellColor(c, maxCount),
+                          background: isUserCell
+                            ? "#a8d5b8"
+                            : getCellBg(c, maxCount),
+                          color: isUserCell
+                            ? "#fff"
+                            : getCellColor(c, maxCount),
+                          outline: isUserCell
+                            ? "2px solid var(--color-green)"
+                            : undefined,
+                          outlineOffset: "-2px",
                         }}
                       >
                         {c > 0 ? c : "0"}
@@ -266,12 +514,37 @@ export default function StatsTable({
         <div className="flex items-center gap-2 text-xs text-muted mt-2">
           <span>少</span>
           <div className="flex gap-0.5">
-            <div className="w-5 h-3 rounded-sm" style={{ background: "#e6f7ef" }} />
-            <div className="w-5 h-3 rounded-sm" style={{ background: "#daf0e2" }} />
-            <div className="w-5 h-3 rounded-sm" style={{ background: "#c8e6d1" }} />
-            <div className="w-5 h-3 rounded-sm" style={{ background: "#b6dcc5" }} />
+            <div
+              className="w-5 h-3 rounded-sm"
+              style={{ background: "#e6f7ef" }}
+            />
+            <div
+              className="w-5 h-3 rounded-sm"
+              style={{ background: "#daf0e2" }}
+            />
+            <div
+              className="w-5 h-3 rounded-sm"
+              style={{ background: "#c8e6d1" }}
+            />
+            <div
+              className="w-5 h-3 rounded-sm"
+              style={{ background: "#b6dcc5" }}
+            />
           </div>
           <span>多</span>
+          {userMbti && userSbti && (
+            <>
+              <span className="mx-1">|</span>
+              <div
+                className="w-5 h-3 rounded-sm border"
+                style={{
+                  background: "#a8d5b8",
+                  borderColor: "var(--color-green)",
+                }}
+              />
+              <span>你的组合</span>
+            </>
+          )}
         </div>
       </div>
     </div>

@@ -251,6 +251,8 @@ export default function Home() {
               topMbtiMatches={stats.topMbtiMatches}
               mbtiTypes={MBTI_TYPES}
               sbtiTypes={SBTI_VALUES}
+              userMbti={submitted ? mbti : null}
+              userSbti={submitted ? sbti : null}
             />
           ) : (
             <div className="text-center text-muted py-8 text-sm">加载中...</div>
