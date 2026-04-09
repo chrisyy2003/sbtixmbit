@@ -255,6 +255,45 @@ export default function Home() {
             <div className="text-center text-muted py-8 text-sm">加载中...</div>
           )}
         </div>
+
+        {/* Footer / Credits */}
+        <div className="bg-card border border-border rounded-[22px] shadow-[0_16px_40px_rgba(47,73,55,0.08)] p-5 mt-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <a
+              href="https://sbti.unun.dev"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex flex-col items-center gap-2 p-4 rounded-[16px] border border-border hover:border-green transition-all hover:shadow-[0_8px_24px_rgba(77,106,83,0.10)]"
+              style={{ background: "linear-gradient(180deg, #ffffff, #f7fbf8)" }}
+            >
+              <span className="text-2xl">&#x1F3AF;</span>
+              <span className="font-bold text-sm text-text">SBTI 人格测试</span>
+              <span className="text-xs text-muted">sbti.unun.dev</span>
+            </a>
+            <a
+              href="https://www.bilibili.com/video/BV1LpDHByET6/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex flex-col items-center gap-2 p-4 rounded-[16px] border border-border hover:border-green transition-all hover:shadow-[0_8px_24px_rgba(77,106,83,0.10)]"
+              style={{ background: "linear-gradient(180deg, #ffffff, #f7fbf8)" }}
+            >
+              <span className="text-2xl">&#x1F3AC;</span>
+              <span className="font-bold text-sm text-text">原作者</span>
+              <span className="text-xs text-muted">B站 @蛆肉儿串儿</span>
+            </a>
+            <a
+              href="https://github.com/chrisyy2003/sbtixmbit"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex flex-col items-center gap-2 p-4 rounded-[16px] border border-border hover:border-green transition-all hover:shadow-[0_8px_24px_rgba(77,106,83,0.10)]"
+              style={{ background: "linear-gradient(180deg, #ffffff, #f7fbf8)" }}
+            >
+              <span className="text-2xl">&#x1F4BB;</span>
+              <span className="font-bold text-sm text-text">GitHub 源码</span>
+              <span className="text-xs text-muted">chrisyy2003/sbtixmbit</span>
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   );
