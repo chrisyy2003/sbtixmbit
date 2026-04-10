@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
       .select()
       .from(comments)
       .where(isNull(comments.parentId))
-      .orderBy(desc(comments.createdAt))
+      .orderBy(desc(comments.likes), desc(comments.createdAt))
       .limit(limit)
       .offset(offset);
 
