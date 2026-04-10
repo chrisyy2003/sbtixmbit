@@ -16,7 +16,7 @@ export default function TypeSelector({
   return (
     <div>
       <div className="text-[16px] font-medium text-text mb-3">{label}</div>
-      <div className="flex flex-wrap gap-2 max-h-52 overflow-y-auto">
+      <div className="flex flex-wrap gap-2 h-52 overflow-y-auto">
         {types.map((t) => {
           const active = selected === t.value;
           return (
