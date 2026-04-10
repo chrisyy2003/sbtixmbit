@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import TypeSelector from "@/components/TypeSelector";
 import StatsTable from "@/components/StatsTable";
+import CommentSection from "@/components/CommentSection";
 
 const MBTI_TYPES = [
   "ISTJ", "ISFJ", "INFJ", "INTJ",
@@ -257,6 +258,14 @@ export default function Home() {
           ) : (
             <div className="text-center text-muted py-8 text-sm">加载中...</div>
           )}
+        </div>
+
+        {/* Comments Card */}
+        <div className="bg-card border border-border rounded-[22px] shadow-[0_16px_40px_rgba(47,73,55,0.08)] p-4 md:p-6 mt-6">
+          <CommentSection
+            userMbti={submitted ? mbti : null}
+            userSbti={submitted ? sbti : null}
+          />
         </div>
 
         {/* Footer / Credits */}
