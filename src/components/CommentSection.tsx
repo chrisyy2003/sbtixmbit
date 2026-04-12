@@ -37,6 +37,7 @@ function CommentItem({
   userMbti,
   userSbti,
   likingIds,
+  likedIds,
   onLike,
   onReplySubmit,
 }: {
@@ -44,6 +45,7 @@ function CommentItem({
   userMbti: string | null;
   userSbti: string | null;
   likingIds: Set<number>;
+  likedIds: Set<number>;
   onLike: (id: number) => void;
   onReplySubmit: (parentId: number, reply: Comment) => void;
 }) {
@@ -90,49 +92,49 @@ function CommentItem({
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center gap-2">
-          {(comment.mbti || comment.sbti) && (
-            <div className="flex items-center gap-1 text-xs">
-              {comment.mbti && (
-                <span className="px-1.5 py-0.5 rounded-full bg-green-light text-green font-medium">
-                  {comment.mbti}
-                </span>
-              )}
-              {comment.mbti && comment.sbti && (
-                <span className="text-muted">x</span>
-              )}
-              {comment.sbti && (
-                <span className="px-1.5 py-0.5 rounded-full bg-green-light text-green font-medium">
-                  {comment.sbti}
-                </span>
-              )}
-            </div>
-          )}
-          <span className="text-xs text-muted">
-            {timeAgo(comment.createdAt)}
-          </span>
-        </div>
+      <div className="flex items-center gap-2 mb-1">
+        {(comment.mbti || comment.sbti) && (
+          <div className="flex items-center gap-1 text-xs">
+            {comment.mbti && (
+              <span className="px-1.5 py-0.5 rounded-full bg-green-light text-green font-medium">
+                {comment.mbti}
+              </span>
+            )}
+            {comment.mbti && comment.sbti && (
+              <span className="text-muted">x</span>
+            )}
+            {comment.sbti && (
+              <span className="px-1.5 py-0.5 rounded-full bg-green-light text-green font-medium">
+                {comment.sbti}
+              </span>
+            )}
+          </div>
+        )}
+        <span className="text-xs text-muted">
+          {timeAgo(comment.createdAt)}
+        </span>
       </div>
-      <p className="text-sm text-text whitespace-pre-wrap break-words leading-relaxed">
-        {comment.content}
-      </p>
-      <div className="mt-2 flex justify-end gap-2">
-        <button
-          onClick={() => setShowReplyInput(!showReplyInput)}
-          className="text-xs px-2 py-1 rounded-full transition-colors hover:bg-green-light"
-          style={{ color: "var(--color-muted)" }}
-        >
-          回复
-        </button>
-        <button
-          onClick={() => onLike(comment.id)}
-          className="flex items-center gap-1 text-xs px-2 py-1 rounded-full transition-colors hover:bg-green-light"
-          style={{ color: "var(--color-muted)" }}
-        >
-          <span>{comment.likes > 0 ? "\u2665" : "\u2661"}</span>
-          <span>{comment.likes > 0 ? comment.likes : "赞"}</span>
-        </button>
+      <div className="flex items-center gap-2">
+        <p className="text-sm text-text whitespace-pre-wrap break-words flex-1">
+          {comment.content}
+        </p>
+        <div className="flex items-center gap-1.5 shrink-0">
+          <button
+            onClick={() => setShowReplyInput(!showReplyInput)}
+            className="text-xs px-1.5 py-0.5 rounded-full transition-colors hover:bg-green-light"
+            style={{ color: "var(--color-muted)" }}
+          >
+            回复
+          </button>
+          <button
+            onClick={() => onLike(comment.id)}
+            className="flex items-center gap-0.5 text-xs px-1.5 py-0.5 rounded-full transition-colors hover:bg-green-light"
+            style={{ color: likedIds.has(comment.id) ? "var(--color-green)" : "var(--color-muted)" }}
+          >
+            <span>{likedIds.has(comment.id) ? "\u2665" : "\u2661"}</span>
+            <span>{comment.likes > 0 ? comment.likes : "赞"}</span>
+          </button>
+        </div>
       </div>
 
       {/* Reply Input */}
@@ -167,43 +169,41 @@ function CommentItem({
 
       {/* Replies */}
       {comment.replies && comment.replies.length > 0 && (
-        <div className="mt-3 ml-4 pl-3 border-l-2 space-y-3" style={{ borderColor: "var(--color-border)" }}>
+        <div className="mt-2 ml-4 pl-3 border-l-2 space-y-2" style={{ borderColor: "var(--color-border)" }}>
           {comment.replies.map((reply) => (
             <div key={reply.id}>
-              <div className="flex items-center justify-between mb-1">
-                <div className="flex items-center gap-2">
-                  {(reply.mbti || reply.sbti) && (
-                    <div className="flex items-center gap-1 text-xs">
-                      {reply.mbti && (
-                        <span className="px-1.5 py-0.5 rounded-full bg-green-light text-green font-medium">
-                          {reply.mbti}
-                        </span>
-                      )}
-                      {reply.mbti && reply.sbti && (
-                        <span className="text-muted">x</span>
-                      )}
-                      {reply.sbti && (
-                        <span className="px-1.5 py-0.5 rounded-full bg-green-light text-green font-medium">
-                          {reply.sbti}
-                        </span>
-                      )}
-                    </div>
-                  )}
-                  <span className="text-xs text-muted">
-                    {timeAgo(reply.createdAt)}
-                  </span>
-                </div>
+              <div className="flex items-center gap-2 mb-1">
+                {(reply.mbti || reply.sbti) && (
+                  <div className="flex items-center gap-1 text-xs">
+                    {reply.mbti && (
+                      <span className="px-1.5 py-0.5 rounded-full bg-green-light text-green font-medium">
+                        {reply.mbti}
+                      </span>
+                    )}
+                    {reply.mbti && reply.sbti && (
+                      <span className="text-muted">x</span>
+                    )}
+                    {reply.sbti && (
+                      <span className="px-1.5 py-0.5 rounded-full bg-green-light text-green font-medium">
+                        {reply.sbti}
+                      </span>
+                    )}
+                  </div>
+                )}
+                <span className="text-xs text-muted">
+                  {timeAgo(reply.createdAt)}
+                </span>
               </div>
-              <p className="text-sm text-text whitespace-pre-wrap break-words leading-relaxed">
-                {reply.content}
-              </p>
-              <div className="mt-1 flex justify-end">
+              <div className="flex items-center gap-2">
+                <p className="text-sm text-text whitespace-pre-wrap break-words flex-1">
+                  {reply.content}
+                </p>
                 <button
                   onClick={() => onLike(reply.id)}
-                  className="flex items-center gap-1 text-xs px-2 py-1 rounded-full transition-colors hover:bg-green-light"
-                  style={{ color: "var(--color-muted)" }}
+                  className="flex items-center gap-0.5 text-xs px-1.5 py-0.5 rounded-full transition-colors hover:bg-green-light shrink-0"
+                  style={{ color: likedIds.has(reply.id) ? "var(--color-green)" : "var(--color-muted)" }}
                 >
-                  <span>{reply.likes > 0 ? "\u2665" : "\u2661"}</span>
+                  <span>{likedIds.has(reply.id) ? "\u2665" : "\u2661"}</span>
                   <span>{reply.likes > 0 ? reply.likes : "赞"}</span>
                 </button>
               </div>
@@ -226,6 +226,19 @@ export default function CommentSection({ userMbti, userSbti }: CommentSectionPro
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [likingIds, setLikingIds] = useState<Set<number>>(new Set());
+  const [likedIds, setLikedIds] = useState<Set<number>>(new Set());
+
+  // Load liked IDs from localStorage
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("sbti-liked-comments");
+      if (stored) {
+        setLikedIds(new Set(JSON.parse(stored)));
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
 
   const fetchComments = useCallback(async (pageNum: number, append: boolean) => {
     try {
@@ -295,29 +308,23 @@ export default function CommentSection({ userMbti, userSbti }: CommentSectionPro
   };
 
   const handleLike = async (id: number) => {
-    if (likingIds.has(id)) return;
+    if (likingIds.has(id) || likedIds.has(id)) return;
     setLikingIds((prev) => new Set(prev).add(id));
-
-    // Helper: update likes in comments (including inside replies)
-    const updateLikes = (prev: Comment[], targetId: number, delta: number): Comment[] => {
-      return prev.map((c) => {
-        if (c.id === targetId) {
-          return { ...c, likes: c.likes + delta };
-        }
-        if (c.replies) {
-          return { ...c, replies: c.replies.map((r) =>
-            r.id === targetId ? { ...r, likes: r.likes + delta } : r
-          )};
-        }
-        return c;
-      });
-    };
 
     // Optimistic update
     setComments((prev) => updateLikes(prev, id, 1));
     try {
       const res = await fetch(`/api/comments/${id}/like`, { method: "POST" });
-      if (!res.ok) {
+      if (res.ok) {
+        const nextLiked = new Set(likedIds);
+        nextLiked.add(id);
+        setLikedIds(nextLiked);
+        try {
+          localStorage.setItem("sbti-liked-comments", JSON.stringify([...nextLiked]));
+        } catch {
+          // ignore
+        }
+      } else {
         setComments((prev) => updateLikes(prev, id, -1));
       }
     } catch {
@@ -329,6 +336,21 @@ export default function CommentSection({ userMbti, userSbti }: CommentSectionPro
         return next;
       });
     }
+  };
+
+  // Helper: update likes in comments (including inside replies)
+  const updateLikes = (prev: Comment[], targetId: number, delta: number): Comment[] => {
+    return prev.map((c) => {
+      if (c.id === targetId) {
+        return { ...c, likes: c.likes + delta };
+      }
+      if (c.replies) {
+        return { ...c, replies: c.replies.map((r) =>
+          r.id === targetId ? { ...r, likes: r.likes + delta } : r
+        )};
+      }
+      return c;
+    });
   };
 
   const handleReplySubmit = (parentId: number, reply: Comment) => {
@@ -433,7 +455,7 @@ export default function CommentSection({ userMbti, userSbti }: CommentSectionPro
           {comments.map((comment) => (
             <div
               key={comment.id}
-              className="rounded-[16px] p-4 border"
+              className="rounded-[16px] px-3 py-2.5 border"
               style={{
                 background: "var(--color-bg)",
                 borderColor: "var(--color-border)",
@@ -444,6 +466,7 @@ export default function CommentSection({ userMbti, userSbti }: CommentSectionPro
                 userMbti={userMbti}
                 userSbti={userSbti}
                 likingIds={likingIds}
+                likedIds={likedIds}
                 onLike={handleLike}
                 onReplySubmit={handleReplySubmit}
               />

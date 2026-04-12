@@ -77,8 +77,10 @@ export default function Home() {
   const fetchStats = useCallback(async () => {
     try {
       const res = await fetch("/api/stats");
-      const data = await res.json();
-      setStats(data);
+      if (res.ok) {
+        const data = await res.json();
+        setStats(data);
+      }
     } catch {
       // silently ignore
     }

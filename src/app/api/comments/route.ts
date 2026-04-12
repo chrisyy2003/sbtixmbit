@@ -21,8 +21,7 @@ export async function GET(req: NextRequest) {
 
     const [{ total }] = await db
       .select({ total: count() })
-      .from(comments)
-      .where(isNull(comments.parentId));
+      .from(comments);
 
     // Fetch replies for all top-level comments in one query
     const parentIds = rows.map((r) => r.id);

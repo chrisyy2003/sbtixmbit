@@ -1,10 +1,11 @@
 import { drizzle } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
 import * as schema from "./schema";
 
-export const db = drizzle({
-  connection: {
-    connectionString: process.env.DATABASE_URL!,
-    ssl: true,
-  },
-  schema,
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL!,
+  ssl: true,
 });
+
+// @ts-expect-error -- `prepare` is supported at runtime but missing from types in drizzle-orm 0.45
+export const db = drizzle(pool, { schema, prepare: false });

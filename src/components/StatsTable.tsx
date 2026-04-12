@@ -521,13 +521,13 @@ function PersonalMatch({
         <span className="font-bold text-text text-base">你的匹配结果</span>
       </div>
 
-      <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-4">
-        <div className="text-center">
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center mb-4">
+        <div className="text-right pr-3">
           <div className="text-2xl font-bold text-green">{mbti}</div>
           <div className="text-xs text-muted">你的 MBTI</div>
         </div>
         <div className="text-2xl text-green font-bold">&times;</div>
-        <div className="text-center">
+        <div className="text-left pl-3">
           <div className="text-2xl font-bold text-green">{sbti}</div>
           <div className="text-xs text-muted">
             你的 SBTI
@@ -590,7 +590,7 @@ export default function StatsTable({
   userMbti,
   userSbti,
 }: StatsTableProps) {
-  if (total === 0) {
+  if (total === 0 || !matrix) {
     return (
       <div className="text-center text-muted py-16 text-sm">
         暂无数据，提交你的类型来参与统计吧！
