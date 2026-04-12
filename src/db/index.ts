@@ -1,11 +1,7 @@
-import { drizzle } from "drizzle-orm/node-postgres";
-import { Pool } from "pg";
+import { drizzle } from "drizzle-orm/neon-http";
+import { neon } from "@neondatabase/serverless";
 import * as schema from "./schema";
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL!,
-  ssl: true,
-});
+const sql = neon(process.env.DATABASE_URL!);
 
-// @ts-expect-error -- `prepare` is supported at runtime but missing from types in drizzle-orm 0.45
-export const db = drizzle(pool, { schema, prepare: false });
+export const db = drizzle(sql, { schema });
